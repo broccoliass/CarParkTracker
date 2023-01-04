@@ -47,6 +47,20 @@ public class HomeActivity extends AppCompatActivity {
             loginButton.setVisibility(View.GONE);
             buttonsLayout.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.VISIBLE);
+
+            ImageView imageView = findViewById(R.id.profile_image);
+
+            // Decode the image file into a Bitmap
+            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile_picture);
+
+            // Resize the bitmap
+            int newWidth = 300;
+            int newHeight = 300;
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+
+            // Set the ImageView to display the resized bitmap
+            imageView.setImageBitmap(resizedBitmap);
+
         } else {
             // User is not signed in
             // Display the login button
@@ -55,20 +69,6 @@ public class HomeActivity extends AppCompatActivity {
             buttonsLayout.setVisibility(View.GONE);
             logoutButton.setVisibility(View.GONE);
         }
-
-        ImageView imageView = findViewById(R.id.profile_image);
-
-        // Decode the image file into a Bitmap
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile_picture);
-
-        // Resize the bitmap
-        int newWidth = 300;
-        int newHeight = 300;
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
-
-        // Set the ImageView to display the resized bitmap
-        imageView.setImageBitmap(resizedBitmap);
-
 
         // Prevent the user from going back to the login screen by pressing the back button
         if (getIntent().getBooleanExtra("EXIT", false)) {
