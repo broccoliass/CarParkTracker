@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "322858730513",
+    "project_id": "newworld-3fa1c",
+    "storage_bucket": "newworld-3fa1c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322858730513:android:46ddf46a6e375b67689db0",
+        "android_client_info": {
+          "package_name": "com.example.newworld"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322858730513-030vfkj2jrcblpbafncb6ftv3th157eq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA7IGH1Umpj97NoFaDGIx82ED2g66DNbw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "322858730513-030vfkj2jrcblpbafncb6ftv3th157eq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
