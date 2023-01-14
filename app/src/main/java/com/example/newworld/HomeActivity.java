@@ -6,25 +6,26 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class HomeActivity extends AppCompatActivity {
-
-    private static final String TAG = "HomeActivity";
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
 
     private TextView loginInfoTextView;
-    private Button mapsButton;
-    private Button aboutButton;
     private Button logoutButton;
     private Button loginButton;
-    private LinearLayout buttonsLayout;
+    private ImageView imageView;
+    private TextView welcomemessage;
+    private GridLayout gridLayout;
+    private CardView mapsButton, aboutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,12 @@ public class HomeActivity extends AppCompatActivity {
         aboutButton = findViewById(R.id.about_button);
         logoutButton = findViewById(R.id.logout_button);
         loginButton = findViewById(R.id.login_button);
-        buttonsLayout = findViewById(R.id.buttons_layout);
+        imageView = findViewById(R.id.profile_picture);
+        welcomemessage = findViewById(R.id.textView2);
+        gridLayout = findViewById(R.id.grid_layout);
+
+        mapsButton.setOnClickListener(this);
+        aboutButton.setOnClickListener(this);
 
         // Check if the user is logged in
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -45,29 +51,17 @@ public class HomeActivity extends AppCompatActivity {
             String email = user.getEmail();
             loginInfoTextView.setText("Logged in as: " + email);
             loginButton.setVisibility(View.GONE);
-            buttonsLayout.setVisibility(View.VISIBLE);
+            gridLayout.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.VISIBLE);
-
-            ImageView imageView = findViewById(R.id.profile_image);
-
-            // Decode the image file into a Bitmap
-            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile_picture);
-
-            // Resize the bitmap
-            int newWidth = 300;
-            int newHeight = 300;
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
-
-            // Set the ImageView to display the resized bitmap
-            imageView.setImageBitmap(resizedBitmap);
+            welcomemessage.setText("So you have logged in. Now you can checkout the maps that show your current location and see information about us or click log out button below to log out.");
 
         } else {
             // User is not signed in
             // Display the login button
-            loginInfoTextView.setText("Not logged in.");
             loginButton.setVisibility(View.VISIBLE);
-            buttonsLayout.setVisibility(View.GONE);
+            gridLayout.setVisibility(View.GONE);
             logoutButton.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
         }
 
         // Prevent the user from going back to the login screen by pressing the back button
@@ -83,23 +77,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Set up the maps button
-        mapsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MapsActivity.class));
-            }
-        });
-
-        // Set up the about button
-        aboutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, AboutActivity.class));
-            }
-        });
-
-        // Set up the logout
+        // Set up the logout button
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,5 +86,17 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.maps_button:
+                startActivity(new Intent(HomeActivity.this, MapsActivity.class));
+                break;
+            case R.id.about_button:
+                startActivity(new Intent(HomeActivity.this, AboutActivity.class));
+                break;
+        }
     }
 }

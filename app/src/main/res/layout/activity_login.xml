@@ -13,28 +13,29 @@
         android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="login_title"
+        android:layout_marginBottom="16dp"
+        android:text="Login to Your Life"
+        android:textColor="#2196F3"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/email_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="email_hint"
+        android:layout_marginBottom="16dp"
+        android:hint="Enter your email here"
         android:inputType="textEmailAddress"
-        android:maxLines="1"
-        android:layout_marginBottom="16dp" />
+        android:maxLines="1" />
 
     <EditText
         android:id="@+id/password_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="password_hint"
+        android:layout_marginBottom="16dp"
+        android:hint="Password is hidden"
         android:inputType="textPassword"
-        android:maxLines="1"
-        android:layout_marginBottom="16dp" />
+        android:maxLines="1" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -48,13 +49,15 @@
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="login_button_text"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#2196F3"
+        android:text="Login" />
 
     <Button
         android:id="@+id/sign_up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="sign_up_button_text" />
+        android:backgroundTint="#2196F3"
+        android:text="SIgn Up" />
 
 </LinearLayout>
