@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.util.Linkify;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -13,9 +16,16 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        // Set the text and make the link clickable
-        TextView aboutText = findViewById(R.id.about_text);
-        aboutText.setText("Learn more about our organization at http://www.example.com");
-        Linkify.addLinks(aboutText, Linkify.WEB_URLS);
+        // Copyright
+        TextView copyrighttext = findViewById(R.id.copyright_text);
+        copyrighttext.setText("Copyright © NewWorld Inc. All rights reserved.");
+        Linkify.addLinks(copyrighttext, Linkify.WEB_URLS);
+        copyrighttext.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
+        copyrighttext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"Copyright © NewWorld Inc. All rights reserved.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
