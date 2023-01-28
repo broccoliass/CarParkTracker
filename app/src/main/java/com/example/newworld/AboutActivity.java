@@ -18,14 +18,15 @@ public class AboutActivity extends AppCompatActivity {
 
         // Copyright
         TextView copyrighttext = findViewById(R.id.copyright_text);
-        copyrighttext.setText("Copyright © NewWorld Inc. All rights reserved.");
+        copyrighttext.setText("Copyright © HospitalFinder Inc. All rights reserved.");
         Linkify.addLinks(copyrighttext, Linkify.WEB_URLS);
         copyrighttext.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
         copyrighttext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"Copyright © NewWorld Inc. All rights reserved.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Copyright © HospitalFinder Inc. All rights reserved.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 }

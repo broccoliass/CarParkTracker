@@ -53,7 +53,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             loginButton.setVisibility(View.GONE);
             gridLayout.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.VISIBLE);
-            welcomemessage.setText("So you have logged in. Now you can checkout the maps that show your current location and see information about us or click log out button below to log out.");
+            welcomemessage.setText("So you have logged in. You can click the maps button to see your current location and nearby hospital or click about us button to see information about us or click log out button to log out.");
 
         } else {
             // User is not signed in
