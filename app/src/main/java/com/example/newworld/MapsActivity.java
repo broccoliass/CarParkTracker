@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
                                 // Set the map's camera position to the current location
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
                                 // Add markers for all hospitals
                                 List<Hospital> hospitals = new ArrayList<>();
                                 hospitals.add(new Hospital("SALAM Shah Alam Specialist Hospital", 3.0492016615573934, 101.53527684342718));

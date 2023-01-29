@@ -3,6 +3,7 @@ package com.example.newworld;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.View;
@@ -15,6 +16,7 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+        setupHyperlink();
 
         // Copyright
         TextView copyrighttext = findViewById(R.id.copyright_text);
@@ -28,5 +30,10 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
     }
+    private void setupHyperlink() {
+        TextView linkTextView = findViewById(R.id.activity_main_link);
+        linkTextView.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
 
 }
