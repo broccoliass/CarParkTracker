@@ -4,9 +4,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -18,32 +25,85 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private List<Hospital> hospitals;
+    private DatabaseHelper databaseHelper;
+    private Button markParkingButton;
+    private Button goToAnotherActivityButton;
+    private Button endSessionButton;
+    private Button viewParkingLocationButton;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Create an instance of DatabaseHelper
+        databaseHelper = new DatabaseHelper(this);
+
+        // Access the database and perform operations
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        // Perform database operations here
+
+        // Close the database when you're done
+        databaseHelper.closeDatabase();
+
+// Button 1: Mark Parking
+        markParkingButton = findViewById(R.id.button1);
+        markParkingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                markParkingLocation();
+            }
+        });
+
+// Button 2: View Recent Parking Location
+        goToAnotherActivityButton = findViewById(R.id.button2);
+        goToAnotherActivityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToAnotherActivity();
+            }
+        });
+
+// Button 3: End Session
+        endSessionButton = findViewById(R.id.button3);
+        endSessionButton.setVisibility(View.GONE); // Initially hidden
+        endSessionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endSession();
+            }
+        });
+
+// Button 4: View Parking Location
+        viewParkingLocationButton = findViewById(R.id.button4);
+        viewParkingLocationButton.setVisibility(View.GONE); // Initially hidden
+        viewParkingLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Implement the logic to view the current parking location
+                // For example, you can retrieve the location from the database and show it on the map
+            }
+        });
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
 
         // Check for location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -57,41 +117,94 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
+                            // Got last known location. In some rare situations, this can be null.
                             if (location != null) {
                                 // Add a marker at the current location
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
                                 // Set the map's camera position to the current location
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-                                // Add markers for all hospitals
-                                List<Hospital> hospitals = new ArrayList<>();
-                                hospitals.add(new Hospital("SALAM Shah Alam Specialist Hospital", 3.0492016615573934, 101.53527684342718));
-                                hospitals.add(new Hospital("KPJ Selangor Specialist Hospital", 3.0572073636360484, 101.54155398688032));
-                                hospitals.add(new Hospital("Avisena Specialist Hospital", 3.071730873001622, 101.52379800593825));
-                                hospitals.add(new Hospital("IJN Selgate Hospital", 3.072049865706741, 101.52274331870775));
-                                hospitals.add(new Hospital("Shah Alam Hospital", 3.0712086366663938, 101.49010267514724));
-                                hospitals.add(new Hospital("Columbia Asia Extended Care Hospital", 3.04732010815699, 101.5050694270794));
-                                hospitals.add(new Hospital("Hospital Umra", 3.082885370653288, 101.53994568168024));
-                                hospitals.add(new Hospital("MSU Medical Centre", 3.0767693928998194, 101.55276231016727));
-                                hospitals.add(new Hospital("Subang Jaya Medical Centre (SJMC)", 3.079869683027289, 101.59387133435948));
-                                hospitals.add(new Hospital("Sunway Medical Centre", 3.0660111943579618, 101.60826685019812));
-                                hospitals.add(new Hospital("Assunta Hospital PJ", 3.0934261775948544, 101.64584510747876));
-                                hospitals.add(new Hospital("Tengku Ampuan Rahimah Hospital, Klang", 3.020067261297631, 101.44008647610751));
-                                hospitals.add(new Hospital("KPJ Klang Specialist Hospital", 3.0622598646169727, 101.46327274490585));
-                                hospitals.add(new Hospital("Sentosa Specialist Hospital Klang", 3.0057591943679234, 101.48292616212605));
-                                hospitals.add(new Hospital("Bukit Tinggi Medical Centre", 3.010055079177547, 101.43184866399302));
-                                // and so on ...
-                                for (Hospital hospital : hospitals) {
-                                    LatLng hospitalLatLng = new LatLng(hospital.getLatitude(), hospital.getLongitude());
-                                    mMap.addMarker(new MarkerOptions().position(hospitalLatLng).title(hospital.getName()));
-                                }
                             }
                         }
-                    })
-            ;}
+                    });
+        }
     }
 
+    private void markParkingLocation() {
+        // Display a confirmation dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to mark the parking location?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Get the current location
+                fusedLocationClient.getLastLocation().addOnSuccessListener(MapsActivity.this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Check if location is available
+                        if (location != null) {
+                            // Store the parking location in the offline database
+                            SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                            ContentValues values = new ContentValues();
+                            values.put("latitude", location.getLatitude());
+                            values.put("longitude", location.getLongitude());
+                            long newRowId = db.insert("parking", null, values);
+                            db.close();
 
+                            if (newRowId != -1) {
+                                // Successful insertion
+                                Toast.makeText(MapsActivity.this, "Parking location marked!", Toast.LENGTH_SHORT).show();
+                                updateButtonsForSession();
+                            } else {
+                                // Failed to insert
+                                Toast.makeText(MapsActivity.this, "Failed to mark parking location.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            // Location is null, unable to mark parking location
+                            Toast.makeText(MapsActivity.this, "Unable to mark parking location. Location is null.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("No", null);
+        builder.show();
+    }
 
+    private void goToAnotherActivity() {
+        // Implement the logic to navigate to another activity here
+        // For example, you can use an Intent to start the desired activity
+
+        Toast.makeText(this, "Going to another activity...", Toast.LENGTH_SHORT).show();
+    }
+
+    private void endSession() {
+        // Display a confirmation dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to end the parking session?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                updateButtonsForNoSession();
+            }
+        });
+        builder.setNegativeButton("No", null);
+        builder.show();
+    }
+
+    private void updateButtonsForSession() {
+        markParkingButton.setVisibility(View.GONE);
+        goToAnotherActivityButton.setVisibility(View.GONE);
+        endSessionButton.setVisibility(View.VISIBLE);
+        viewParkingLocationButton.setVisibility(View.VISIBLE);
+    }
+
+    private void updateButtonsForNoSession() {
+        markParkingButton.setVisibility(View.VISIBLE);
+        goToAnotherActivityButton.setVisibility(View.VISIBLE);
+        endSessionButton.setVisibility(View.GONE);
+        viewParkingLocationButton.setVisibility(View.GONE);
+    }
 }
