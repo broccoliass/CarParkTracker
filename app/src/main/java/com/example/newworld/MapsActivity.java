@@ -21,7 +21,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -36,6 +39,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button endSessionButton;
     private Button viewParkingLocationButton;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Marker currentLocationMarker; // To store the current location marker
+    private Marker parkingLocationMarker; // To store the parking location marker
+    private boolean parkingLocationMarked = false; // Flag to indicate if parking location is marked
+
+
+
 
 
     @Override
@@ -112,21 +121,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // Permission has already been granted, get the last known location
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations, this can be null.
-                            if (location != null) {
-                                // Add a marker at the current location
-                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
-                                // Set the map's camera position to the current location
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-                            }
+            // Permission has already been granted
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    // Got last known location. In some rare situations, this can be null.
+                    if (location != null) {
+                        // Set the map's camera position to the current location
+                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+
+                        // Add a marker at the current location if parking location is not marked
+                        if (!parkingLocationMarked) {
+                            currentLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
                         }
-                    });
+                    }
+                }
+            });
         }
     }
 
@@ -156,6 +167,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 // Successful insertion
                                 Toast.makeText(MapsActivity.this, "Parking location marked!", Toast.LENGTH_SHORT).show();
                                 updateButtonsForSession();
+
+                                // Remove the current location marker
+                                if (currentLocationMarker != null) {
+                                    currentLocationMarker.setVisible(false);
+                                }
+
+                                // Create a custom marker icon with a different color
+                                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+
+                                // Add a marker for the parking location with the custom icon
+                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                parkingLocationMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .title("You parked here")
+                                        .icon(icon));
+
+                                parkingLocationMarked = true; // Update the flag to indicate parking location is marked
                             } else {
                                 // Failed to insert
                                 Toast.makeText(MapsActivity.this, "Failed to mark parking location.", Toast.LENGTH_SHORT).show();
@@ -171,6 +199,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.setNegativeButton("No", null);
         builder.show();
     }
+
+
 
     private void goToAnotherActivity() {
         // Implement the logic to navigate to another activity here
@@ -188,11 +218,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 updateButtonsForNoSession();
+
+                // Remove the parking location marker
+                if (parkingLocationMarker != null) {
+                    parkingLocationMarker.remove();
+                    parkingLocationMarker = null;
+                }
+
+                // Make the current location marker visible again
+                if (currentLocationMarker != null) {
+                    currentLocationMarker.setVisible(true);
+                }
+
+                parkingLocationMarked = false; // Update the flag to indicate parking location is no longer marked
             }
         });
         builder.setNegativeButton("No", null);
         builder.show();
     }
+
 
     private void updateButtonsForSession() {
         markParkingButton.setVisibility(View.GONE);
