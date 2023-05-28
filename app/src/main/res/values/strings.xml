@@ -5,4 +5,5 @@
     <string name="maps">Maps</string>
     <string name="about">About</string>
     <string name="logout">Logout</string>
-    <string name="hyperlink">Learn more about us at\n<a href="https://github.com/broccoliass/NewWorldMobile/">HospitalFinder.com</a></string></resources>
+    <string name="hyperlink">Learn more about us at\n<a href="https://github.com/broccoliass/NewWorldMobile/">HospitalFinder.com</a></string>
+</resources>

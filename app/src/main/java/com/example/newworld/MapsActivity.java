@@ -7,7 +7,9 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
@@ -50,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private DatabaseHelper databaseHelper;
     private Button markParkingButton;
-    private Button viewCurrentSessionButton;
+    private Button viewRecentSessionButton;
     private Button endSessionButton;
     private Button viewParkingLocationButton;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -94,11 +96,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 // Button 2: View Recent Parking Location
-        viewCurrentSessionButton = findViewById(R.id.button2);
-        viewCurrentSessionButton.setOnClickListener(new View.OnClickListener() {
+        viewRecentSessionButton = findViewById(R.id.button2);
+        viewRecentSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewCurrentSession();
+                //viewRecentSession();
             }
         });
 
@@ -118,11 +120,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         viewParkingLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement the logic to view the current parking location
-                // For example, you can retrieve the location from the database and show it on the map
+                viewCurrentSession();
             }
         });
-
     }
 
     @Override
@@ -268,10 +268,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void viewCurrentSession() {
-        // Implement the logic to view current session
+        // Get the details of the current session from the database
+        ParkingSession currentSession = getCurrentParkingSession();
 
-        Toast.makeText(this, "Going to another activity...", Toast.LENGTH_SHORT).show();
+        // Check if there is a current session
+        if (currentSession != null) {
+            Intent intent = new Intent(this, ParkingDetailsActivity.class);
+            intent.putExtra("parkingSession", currentSession);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "No current session found.", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    private ParkingSession getCurrentParkingSession() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM parking ORDER BY created_at DESC LIMIT 1", null);
+
+        ParkingSession currentSession = null;
+        if (cursor.moveToFirst()) {
+            double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+            double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+            String createdAt = cursor.getString(cursor.getColumnIndex("created_at"));
+
+            currentSession = new ParkingSession(latitude, longitude, createdAt);
+        }
+
+        cursor.close();
+        db.close();
+
+        return currentSession;
+    }
+
+
 
     private void endSession() {
         // Display a confirmation dialog
@@ -304,14 +333,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateButtonsForSession() {
         markParkingButton.setVisibility(View.GONE);
-        viewCurrentSessionButton.setVisibility(View.GONE);
+        viewRecentSessionButton.setVisibility(View.GONE);
         endSessionButton.setVisibility(View.VISIBLE);
         viewParkingLocationButton.setVisibility(View.VISIBLE);
     }
 
     private void updateButtonsForNoSession() {
         markParkingButton.setVisibility(View.VISIBLE);
-        viewCurrentSessionButton.setVisibility(View.VISIBLE);
+        viewRecentSessionButton.setVisibility(View.VISIBLE);
         endSessionButton.setVisibility(View.GONE);
         viewParkingLocationButton.setVisibility(View.GONE);
     }
