@@ -105,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Close the database when you're done
         databaseHelper.closeDatabase();
 
-// Button 1: Mark Parking
+        // Button 1: Mark Parking
         markParkingButton = findViewById(R.id.button1);
         markParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,16 +114,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-// Button 2: View Recent Parking Location
+        // Button 2: View Recent Parking Location
         viewRecentSessionButton = findViewById(R.id.button2);
         viewRecentSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //viewRecentSession();
+                viewRecentSession();
             }
         });
 
-// Button 3: End Session
+        // Button 3: End Session
         endSessionButton = findViewById(R.id.button3);
         endSessionButton.setVisibility(View.GONE); // Initially hidden
         endSessionButton.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-// Button 4: View Parking Location
+        // Button 4: View Parking Location
         viewParkingLocationButton = findViewById(R.id.button4);
         viewParkingLocationButton.setVisibility(View.GONE); // Initially hidden
         viewParkingLocationButton.setOnClickListener(new View.OnClickListener() {
@@ -226,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         parkingLocationMarked = true; // Update the flag to indicate parking location is marked
 
-                                        // Send the parking location data to your DigitalOcean droplet
+                                        // Send the parking location data to DigitalOcean droplet
                                         sendParkingLocationToDroplet(location.getLatitude(), location.getLongitude(), streetName);
                                     } else {
                                         // Failed to insert
@@ -252,6 +252,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.show();
     }
 
+    // Helper method to get the current timestamp
+    private String getCurrentTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
     private void sendParkingLocationToDroplet(double latitude, double longitude, String streetName) {
         // Create a JSON object to hold the latitude, longitude, and street name values
         JSONObject jsonParams = new JSONObject();
@@ -268,7 +274,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         // Define the API endpoint URL
-        String url = "http://157.230.252.173/postparking.php";
+        String url = "http://157.230.252.173/parking_api.php";
 
         // Create a POST request
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonParams,
@@ -298,12 +304,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add the request to the request queue
         requestQueue.add(jsonObjectRequest);
-    }
-
-    // Helper method to get the current timestamp
-    private String getCurrentTimestamp() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        return sdf.format(new Date());
     }
 
     private void viewCurrentSession() {
@@ -339,7 +339,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return currentSession;
     }
 
-
+    private void viewRecentSession() {
+        Intent intent = new Intent(MapsActivity.this, RecentSessionsActivity.class);
+        startActivity(intent);
+    }
 
     private void endSession() {
         // Display a confirmation dialog
@@ -368,7 +371,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.setNegativeButton("No", null);
         builder.show();
     }
-
 
     private void updateButtonsForSession() {
         markParkingButton.setVisibility(View.GONE);
