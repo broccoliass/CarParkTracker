@@ -329,8 +329,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
             double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
             String createdAt = cursor.getString(cursor.getColumnIndex("created_at"));
+            String streetName = cursor.getString(cursor.getColumnIndex("street_name")); // Get the street name
 
-            currentSession = new ParkingSession(latitude, longitude, createdAt);
+            currentSession = new ParkingSession(latitude, longitude, createdAt, streetName);
         }
 
         cursor.close();
