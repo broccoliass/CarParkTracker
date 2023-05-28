@@ -21,7 +21,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createTableQuery = "CREATE TABLE parking (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "latitude REAL," +
-                "longitude REAL)";
+                "longitude REAL," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createTableQuery);
     }
 

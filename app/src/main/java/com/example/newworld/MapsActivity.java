@@ -38,6 +38,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -47,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private DatabaseHelper databaseHelper;
     private Button markParkingButton;
-    private Button goToAnotherActivityButton;
+    private Button viewCurrentSessionButton;
     private Button endSessionButton;
     private Button viewParkingLocationButton;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -91,11 +94,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 // Button 2: View Recent Parking Location
-        goToAnotherActivityButton = findViewById(R.id.button2);
-        goToAnotherActivityButton.setOnClickListener(new View.OnClickListener() {
+        viewCurrentSessionButton = findViewById(R.id.button2);
+        viewCurrentSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToAnotherActivity();
+                viewCurrentSession();
             }
         });
 
@@ -172,6 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             ContentValues values = new ContentValues();
                             values.put("latitude", location.getLatitude());
                             values.put("longitude", location.getLongitude());
+                            values.put("created_at", getCurrentTimestamp());
                             long newRowId = db.insert("parking", null, values);
                             db.close();
 
@@ -257,9 +261,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void goToAnotherActivity() {
-        // Implement the logic to navigate to another activity here
-        // For example, you can use an Intent to start the desired activity
+    // Helper method to get the current timestamp
+    private String getCurrentTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    private void viewCurrentSession() {
+        // Implement the logic to view current session
 
         Toast.makeText(this, "Going to another activity...", Toast.LENGTH_SHORT).show();
     }
@@ -295,14 +304,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateButtonsForSession() {
         markParkingButton.setVisibility(View.GONE);
-        goToAnotherActivityButton.setVisibility(View.GONE);
+        viewCurrentSessionButton.setVisibility(View.GONE);
         endSessionButton.setVisibility(View.VISIBLE);
         viewParkingLocationButton.setVisibility(View.VISIBLE);
     }
 
     private void updateButtonsForNoSession() {
         markParkingButton.setVisibility(View.VISIBLE);
-        goToAnotherActivityButton.setVisibility(View.VISIBLE);
+        viewCurrentSessionButton.setVisibility(View.VISIBLE);
         endSessionButton.setVisibility(View.GONE);
         viewParkingLocationButton.setVisibility(View.GONE);
     }
