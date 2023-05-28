@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -42,6 +43,24 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.database.sqlite.SQLiteDatabase;
+import android.content.ContentValues;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -170,37 +189,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onSuccess(Location location) {
                         // Check if location is available
                         if (location != null) {
-                            // Store the parking location in the local SQLite database
-                            SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                            ContentValues values = new ContentValues();
-                            values.put("latitude", location.getLatitude());
-                            values.put("longitude", location.getLongitude());
-                            values.put("created_at", getCurrentTimestamp());
-                            long newRowId = db.insert("parking", null, values);
-                            db.close();
+                            // Perform reverse geocoding to get the address
+                            Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                            List<Address> addresses;
+                            try {
+                                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                if (!addresses.isEmpty()) {
+                                    Address address = addresses.get(0);
+                                    String streetName = address.getAddressLine(0); // Get the street name
 
-                            if (newRowId != -1) {
-                                // Successful insertion
-                                Toast.makeText(MapsActivity.this, "Parking location marked!", Toast.LENGTH_SHORT).show();
-                                updateButtonsForSession();
+                                    // Store the parking location in the local SQLite database
+                                    SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                                    ContentValues values = new ContentValues();
+                                    values.put("latitude", location.getLatitude());
+                                    values.put("longitude", location.getLongitude());
+                                    values.put("street_name", streetName); // Store the street name
+                                    values.put("created_at", getCurrentTimestamp());
+                                    long newRowId = db.insert("parking", null, values);
+                                    db.close();
 
-                                // Create a custom marker icon with a different color
-                                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                                    if (newRowId != -1) {
+                                        // Successful insertion
+                                        Toast.makeText(MapsActivity.this, "Parking location marked!", Toast.LENGTH_SHORT).show();
+                                        updateButtonsForSession();
 
-                                // Add a marker for the parking location with the custom icon
-                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                parkingLocationMarker = mMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .title("You parked here")
-                                        .icon(icon));
+                                        // Create a custom marker icon with a different color
+                                        BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
 
-                                parkingLocationMarked = true; // Update the flag to indicate parking location is marked
+                                        // Add a marker for the parking location with the custom icon
+                                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                        parkingLocationMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(latLng)
+                                                .title("You parked here")
+                                                .snippet(streetName) // Set the street name as the marker snippet
+                                                .icon(icon));
 
-                                // Send the parking location data to your DigitalOcean droplet
-                                sendParkingLocationToDroplet(location.getLatitude(), location.getLongitude());
-                            } else {
-                                // Failed to insert
-                                Toast.makeText(MapsActivity.this, "Failed to mark parking location.", Toast.LENGTH_SHORT).show();
+                                        parkingLocationMarked = true; // Update the flag to indicate parking location is marked
+
+                                        // Send the parking location data to your DigitalOcean droplet
+                                        sendParkingLocationToDroplet(location.getLatitude(), location.getLongitude(), streetName);
+                                    } else {
+                                        // Failed to insert
+                                        Toast.makeText(MapsActivity.this, "Failed to mark parking location.", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    // No address found
+                                    Toast.makeText(MapsActivity.this, "Unable to retrieve address for the location.", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(MapsActivity.this, "Failed to perform reverse geocoding.", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             // Location is null, unable to mark parking location
@@ -214,12 +252,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.show();
     }
 
-    private void sendParkingLocationToDroplet(double latitude, double longitude) {
-        // Create a JSON object to hold the latitude and longitude values
+    private void sendParkingLocationToDroplet(double latitude, double longitude, String streetName) {
+        // Create a JSON object to hold the latitude, longitude, and street name values
         JSONObject jsonParams = new JSONObject();
         try {
             jsonParams.put("latitude", latitude);
             jsonParams.put("longitude", longitude);
+            jsonParams.put("street_name", streetName);
         } catch (JSONException e) {
             e.printStackTrace();
             return;
