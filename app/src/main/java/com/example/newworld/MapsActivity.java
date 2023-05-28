@@ -28,6 +28,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -155,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onSuccess(Location location) {
                         // Check if location is available
                         if (location != null) {
-                            // Store the parking location in the offline database
+                            // Store the parking location in the local SQLite database
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             ContentValues values = new ContentValues();
                             values.put("latitude", location.getLatitude());
@@ -168,11 +180,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast.makeText(MapsActivity.this, "Parking location marked!", Toast.LENGTH_SHORT).show();
                                 updateButtonsForSession();
 
-                                // Remove the current location marker
-                                if (currentLocationMarker != null) {
-                                    currentLocationMarker.setVisible(false);
-                                }
-
                                 // Create a custom marker icon with a different color
                                 BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
 
@@ -184,6 +191,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .icon(icon));
 
                                 parkingLocationMarked = true; // Update the flag to indicate parking location is marked
+
+                                // Send the parking location data to your DigitalOcean droplet
+                                sendParkingLocationToDroplet(location.getLatitude(), location.getLongitude());
                             } else {
                                 // Failed to insert
                                 Toast.makeText(MapsActivity.this, "Failed to mark parking location.", Toast.LENGTH_SHORT).show();
@@ -200,7 +210,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.show();
     }
 
+    private void sendParkingLocationToDroplet(double latitude, double longitude) {
+        // Create a JSON object to hold the latitude and longitude values
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("latitude", latitude);
+            jsonParams.put("longitude", longitude);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
 
+        // Create a request queue using Volley library
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        // Define the API endpoint URL
+        String url = "http://157.230.252.173/postparking.php";
+
+        // Create a POST request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonParams,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle the response from the API
+                        try {
+                            String status = response.getString("status");
+                            String message = response.getString("message");
+
+                            // Display a toast message based on the response
+                            Toast.makeText(MapsActivity.this, message, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error response
+                        Toast.makeText(MapsActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        // Add the request to the request queue
+        requestQueue.add(jsonObjectRequest);
+    }
 
     private void goToAnotherActivity() {
         // Implement the logic to navigate to another activity here
