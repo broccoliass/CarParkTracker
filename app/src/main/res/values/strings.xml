@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HospitalFinder</string>
+    <string name="app_name">ParkSpot</string>
     <string name="map_key" translatable="false">AIzaSyDLqsqFQ-Jvqyf9WnwIlNmuuEOTw6eudJw</string>
     <string name="not_logged_in">Not logged in.</string>
     <string name="maps">Maps</string>

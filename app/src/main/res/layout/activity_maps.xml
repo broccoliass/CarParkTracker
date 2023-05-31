@@ -24,30 +24,47 @@
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mark Parking" />
+            android:text="Save parking"
+            android:layout_marginStart="18dp"
+            android:background="@drawable/rounded_rectangle"
+            android:textColor="@color/white"
+            android:focusable="true"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="View Recent Session"
-            android:layout_marginStart="16dp" />
+            android:text="View recent parking"
+            android:layout_marginStart="17dp"
+            android:background="@drawable/rounded_rectangle_clear"
+            android:textColor="@color/black"
+            android:focusable="true"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="End Session"
-            android:layout_marginStart="16dp"
-            android:visibility="gone" />
+            android:text="Clear parking"
+            android:layout_marginStart="18dp"
+            android:visibility="gone"
+            android:background="@drawable/rounded_rectangle"
+            android:textColor="@color/white"
+            android:focusable="true"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/button4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="View Parking Location"
-            android:layout_marginStart="16dp"
-            android:visibility="gone" />
+            android:text="View parking location"
+            android:layout_marginStart="17dp"
+            android:visibility="gone"
+            android:background="@drawable/rounded_rectangle_clear"
+            android:textColor="@color/black"
+            android:focusable="true"
+            android:textAllCaps="false" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -59,7 +59,7 @@ public class ParkingDetailsActivity extends AppCompatActivity {
             textViewTime.setText("Saved " + timeAgo);
 
             // Set the street name
-            textViewStreetName.setText("Near " + parkingSession.getStreetName());
+            textViewStreetName.setText("near " + parkingSession.getStreetName());
 
             // Set the date and time
             String formattedDateTime = getFormattedDateTime(parkingSession.getCreatedAt());
