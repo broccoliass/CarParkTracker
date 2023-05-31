@@ -32,7 +32,7 @@ public class ParkingDetailsActivity extends AppCompatActivity {
     private TextView textViewStreetName;
     private TextView textViewDateTime;
     private Button buttonDirections;
-    private Button buttonShowMap;
+//    private Button buttonShowMap;
 
     private ParkingSession parkingSession;
 
@@ -44,7 +44,7 @@ public class ParkingDetailsActivity extends AppCompatActivity {
         textViewTime = findViewById(R.id.textViewTime);
         textViewStreetName = findViewById(R.id.textViewStreetName);
         buttonDirections = findViewById(R.id.buttonDirections);
-        buttonShowMap = findViewById(R.id.buttonShowMap);
+//        buttonShowMap = findViewById(R.id.buttonShowMap);
         textViewDateTime = findViewById(R.id.textViewDateTime);
 
         // Retrieve the ParkingSession object from the intent
@@ -74,12 +74,12 @@ public class ParkingDetailsActivity extends AppCompatActivity {
             }
         });
 
-        buttonShowMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openMapActivity();
-            }
-        });
+//        buttonShowMap.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                openMapActivity();
+//            }
+//        });
     }
 
     private String getTimeAgo(String createdAt) {
@@ -122,11 +122,11 @@ public class ParkingDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void openMapActivity() {
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
-        finish();
-    }
+//    private void openMapActivity() {
+//        Intent intent = new Intent(this, MapsActivity.class);
+//        startActivity(intent);
+//        finish();
+//    }
 
 
 }
