@@ -39,7 +39,7 @@ public class RecentSessionsActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         // Define the API endpoint URL on DigitalOcean droplet
-        String url = "http://157.230.252.173/parking_api.php";
+        String url = "http://157.230.252.173:8080/parking_api.php";
 
         // Create a GET request
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,

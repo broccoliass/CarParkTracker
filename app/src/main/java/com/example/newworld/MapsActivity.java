@@ -274,7 +274,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         // Define the API endpoint URL
-        String url = "http://157.230.252.173/parking_api.php";
+        String url = "http://157.230.252.173:8080/parking_api.php";
 
         // Create a POST request
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonParams,
